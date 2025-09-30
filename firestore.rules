@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Check if user is admin
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // -------------------------------
+    // Doctors
+    // -------------------------------
+    match /doctors/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------
+    // Blog
+    // -------------------------------
+    match /blog/{docId} {
+      allow read: if resource.data.status == 'Published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------
+    // Events
+    // -------------------------------
+    match /events/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------
+    // Billable Services
+    // -------------------------------
+    match /billable_services/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------
+    // Content (About, Homepage sections)
+    // -------------------------------
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------
+    // Users
+    // -------------------------------
+    match /users/{userId} {
+      allow get: if request.auth.uid == userId || isAdmin();
+      allow list: if isAdmin();
+      allow create: if request.auth.uid == userId;
+
+      // Users can only update safe fields (cannot elevate role)
+      allow update: if request.auth.uid == userId &&
+                    request.resource.data.role == resource.data.role;
+      allow update: if isAdmin(); // Admins can update everything
+
+      allow delete: if false; // No one deletes users directly
+    }
+
+    // -------------------------------
+    // Appointments
+    // -------------------------------
+    match /appointments/{appointmentId} {
+      allow read: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow create: if request.auth.uid == request.resource.data.patientId;
+      allow update: if request.auth.uid == resource.data.patientId ||
+                     isAdmin();
+      allow delete: if isAdmin(); // Patients cannot delete
+    }
+
+    // -------------------------------
+    // Invoices
+    // -------------------------------
+    match /invoices/{invoiceId} {
+      allow read: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+                     (request.auth.uid == resource.data.patientId &&
+                      request.resource.data.status == 'Paid');
+    }
+
+    // -------------------------------
+    // Conversations (Chats)
+    // -------------------------------
+    match /conversations/{convoId} {
+      allow read: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow create: if request.auth.uid == request.resource.data.patientId || isAdmin();
+      allow update: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow delete: if isAdmin(); // Patients cannot delete
+    }
+
+    // -------------------------------
+    // Telemedicine Sessions
+    // -------------------------------
+    match /telemedicine/{sessionId} {
+      allow read: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow create: if request.auth.uid == request.resource.data.patientId;
+      allow update: if request.auth.uid == resource.data.patientId || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // -------------------------------
+    // Notifications
+    // -------------------------------
+    match /notifications/{notificationId} {
+      allow read: if (resource.data.recipientId == request.auth.uid) ||
+                   (resource.data.recipientId == 'admin' && isAdmin());
+
+      allow update: if (resource.data.recipientId == request.auth.uid) ||
+                    (resource.data.recipientId == 'admin' && isAdmin());
+
+      allow create: if isAdmin(); // Only admins/system can create
+    }
+  }
+}
