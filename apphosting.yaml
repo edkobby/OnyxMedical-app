@@ -5,3 +5,17 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyAskUTMG7FMnvWRqBdvCAA4Nkzczr9DvLs"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "onyx-medical-hub.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "onyx-medical-hub"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "onyx-medical-hub.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "585015032388"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:585015032388:web:02afca62c11ff9a3641a11"
