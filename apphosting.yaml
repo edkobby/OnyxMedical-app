@@ -8,7 +8,7 @@ runConfig:
 
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: "AIzaSyAskUTMG7FMnvWRqBdvCAA4Nkzczr9DvLs"
+    value: "AIzaSyCzmkKM8rZ7CSCwuvejRGAeV_8EHI4sXYo"
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
     value: "onyx-medical-hub.firebaseapp.com"
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
